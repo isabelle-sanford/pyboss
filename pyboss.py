@@ -1,5 +1,6 @@
 import csv
 
+# open file and extract data
 with open("employee_data.csv", "r") as f:
     data_iter = csv.reader(f)
 
@@ -7,14 +8,10 @@ with open("employee_data.csv", "r") as f:
 
     data = list(data_iter)
 
-# Emp ID,Name,DOB,SSN,State
-# 214,Sarah Simpson,1985-12-04,282-01-8166,Florida
-#       TO
-# Emp ID,First Name,Last Name,DOB,SSN,State
-# 214,Sarah,Simpson,12/04/1985,***-**-8166,FL
-
+# zip into columns
 cols = list(zip(*data))
 
+# starting columns
 empid = cols[0] # no change needed
 name = cols[1] # split to 1st and last
 dob_init = cols[2] # change format
@@ -22,22 +19,24 @@ ssn_init = cols[3] # star first five digits
 state_init = cols[4] # abbreviate
 
 # NAME
-names = [n.split(' ') for n in name]
-splitnames = list(zip(*names))
+names = [n.split(' ') for n in name] # split by space
+splitnames = list(zip(*names)) # zip into first and last cols
 
 first_name = splitnames[0]
 last_name = splitnames[1]
 
-# check = [len(s) for s in names]
-# print(max(check))
 
 # DOB
-dob1 = [d.split('-') for d in dob_init]
-dob2 = list(zip(*dob1))
+dob1 = [d.split('-') for d in dob_init] # initial format '1990-01-30'
+dob2 = list(zip(*dob1)) # zip into y/m/d columns
+
 year = dob2[0]
 month = dob2[1]
 day = dob2[2]
-dobf = [f"{month[f]}/{day[f]}/{year[f]}" for f in range(len(dob2))]
+
+# reorder and reformat into 1 column
+dobf = [f"{month[f]}/{day[f]}/{year[f]}" for f in range(len(dob1))]
+
 
 # SSN
 replace = "***-**-"
@@ -59,14 +58,14 @@ abbrev = {'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR',
 }
 
 
-state_f = [abbrev[st] for st in state_init]
+state_f = [abbrev[st] for st in state_init] # look up key state for value abbrev in provided dict
 
 
+# create output (header and rows)
 headerf = ['Emp ID','First Name','Last Name','DOB','SSN','State']
-rows = list(zip(*(empid, first_name, last_name, dobf, ssn_final, state_f)))
+rows = zip(*(empid, first_name, last_name, dobf, ssn_final, state_f))
 
-print(rows)
-
+# print into new csv
 with open('finished_data.csv', 'w', newline="") as final:
     writer = csv.writer(final)
     writer.writerow(headerf)
